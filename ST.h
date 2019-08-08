@@ -145,6 +145,16 @@ public:
 	STnode* findChildByStr(STnode* node, char character);
 
 	/**
+	 * Returns a pointer to a set of positions in which a particular query string occurs (exact occurrence).
+	 *
+	 * @param str The query string.
+	 * @param occs A vector containing all occurrences (call by reference).
+	 *
+	 * @author Thanasis Vergoulis 
+	 */
+	void findStr(string str, vector<OccPos*>& occs);
+
+	/**
 	 * Returns a particular character from the label of the incoming edge of a given node.
 	 *
 	 * @param node The node.
@@ -156,7 +166,17 @@ public:
 	 */
 	char getLabelChar(STnode* node,long char_id);
 	
-	
+	/**
+	 * Returns the input edge's label of a given node.
+	 *
+	 * @param node The node.
+	 *
+	 * @return The label. 
+	 *
+	 * @author Thanasis Vergoulis
+	 */
+	string getLabel(STnode* node);
+
 	/**
 	 * Prints the suffix tree. 
 	 *

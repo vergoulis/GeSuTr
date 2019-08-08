@@ -22,6 +22,7 @@
 #define STNODE_H
 
 #include <iostream>
+#include <vector>
 using namespace std;
 
 /**
@@ -258,6 +259,26 @@ public:
 	 * @author Thanasis Vergoulis
 	 */
 	void printOccPos();
+
+	/**
+	 * Gets all leaves in the subtree of the node. 
+	 *
+	 * @param leaves A vector containing pointers to the leaves (call by reference). Attention! Input 
+	 * vector has to be empty. 
+	 *
+	 * @author Thanasis Vergoulis
+	 */
+	void getSubtreeLeaves(vector<STnode*>& leaves); 
+
+	/**
+	 * Gets all occurrences in the subtree of the node.
+	 *
+	 * @param occs A vector containing pointers to the occurrences (call by reference). Attention! Inpit 
+	 * vector has to be empty.
+	 *
+	 * @authot Thanasis Vergoulis
+	 */
+	void getSubtreeOccs(vector<OccPos*>& occs);
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
 	long _str_id;

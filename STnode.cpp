@@ -178,29 +178,42 @@ void STnode::printOccPos()
 	}
 }
 
+void STnode::getSubtreeLeaves(vector<STnode*>& leaves)
+{
+	STnode* ch_node = this->getChildren();	//Point to the first child
 
+	while(ch_node != NULL) 
+	{  
+		if( ch_node->isLeaf() )
+			leaves.push_back(ch_node); //record this leaf
+		else
+			ch_node->getSubtreeLeaves(leaves); //find this node's leaves
 
+		ch_node = ch_node->getRightSibling();	//Check the next sibling
+	}
+}
 
+void STnode::getSubtreeOccs(vector<OccPos*>& occs)
+{
+	STnode* ch_node = this->getChildren();	//Point to the first child
+	OccPos* cur_p;
 
+	while(ch_node != NULL) 
+	{  
+		if( ch_node->isLeaf() )
+		{
+			cur_p = ch_node->_occ_positions;
+			while( cur_p!=NULL )
+			{
+				occs.push_back(cur_p);
+				cur_p = cur_p->_next_pos;
+			}
+		}
+		else
+		{
+			ch_node->getSubtreeOccs(occs); //find this node's leaves
+		}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		ch_node = ch_node->getRightSibling();	//Check the next sibling
+	}
+}

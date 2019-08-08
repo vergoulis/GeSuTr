@@ -216,9 +216,34 @@ STnode* ST::findChildByStr(STnode* node, char character)
 	return NULL; //no proper sibling found
 }
 
+void ST::findStr(string str, vector<OccPos*>& occs)
+{
+	STnode* cur_node = this->_st_root; 
+	long read_chr = 0; //the number of read characters
+	long str_len = str.length(); //the initial length of the string
+	
+	while( str_len !=0 ) //while there is still part of the string unread
+	{
+		read_chr = traverseNodeNaive( cur_node, str); //traverse to the next level
+
+		if( read_chr == 0 ) //nowhere to go
+			return; //no recorded occurrence
+		
+		str_len -= read_chr;
+		str = str.substr(read_chr,str_len);
+	}
+
+	cur_node->getSubtreeOccs(occs);
+}
+
 char ST::getLabelChar(STnode* node,long char_id)
 {
 	return this->_strs[node->getRefStrId()][node->getInLabelStart()+char_id];
+}
+
+string ST::getLabel(STnode* node)
+{
+	return this->_strs[node->getRefStrId()].substr(node->getInLabelStart(),node->getInLabelLength());
 }
 
 void ST::print(void)

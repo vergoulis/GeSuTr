@@ -34,8 +34,24 @@ int main(int argc, char* argv[])
 	strs[0] = "banana$";
 	strs[1] = "moana$";
 
+	//create the generalised suffix tree
 	ST* my_tree;
 	my_tree = new ST(strs,2);
+
+	//use the generalised suffix tree to find exact occurrences (matches) of a string
+	vector<OccPos*> str_occs;
+	my_tree->findStr("ana",str_occs);
+
+	//print the results
+	cout<<endl;
+	cout<<"Found "<<str_occs.size()<<" matches."<<endl;
+	vector<OccPos*>::iterator cur_occ;
+	cur_occ = str_occs.begin();
+	while(cur_occ!=str_occs.end())
+	{
+		cout<<"(str_id: "<<(*cur_occ)->_str_id<<", pos: "<<(*cur_occ)->_occ_pos<<")"<<endl;
+		cur_occ++;
+	}
 
 	return 0;
 }
