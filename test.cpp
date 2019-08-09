@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 
 	//use the generalised suffix tree to find exact occurrences (matches) of a string
 	vector<OccPos*> str_occs;
-	my_tree->findStr("anana",str_occs);
+	my_tree->findStr("ana",str_occs);
 
 	//print the results
 	cout<<endl;
@@ -53,8 +53,8 @@ int main(int argc, char* argv[])
 		cur_occ++;
 	}
 
-	//test counters
-//	my_tree->updNodeCnts();
+	//test occ counters for each node (if needed)
+	my_tree->updNodeCnts();
 
 	return 0;
 }

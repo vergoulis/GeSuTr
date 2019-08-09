@@ -290,11 +290,17 @@ void ST::updNodeCnts()
 
 void ST::updNodeCnt( STnode* cur_node)
 {
-	cout<<"Updating cnt for node "<<cur_node<<" with in label '"<<this->getLabel(cur_node)<<"'..."<<endl;
 	cur_node->updateSubtreeOccNum();
+	cur_node = cur_node->getChildren();
+	if( cur_node!= NULL )
+	{
+		this->updNodeCnt(cur_node); //get first child
+	}
 	while( cur_node!= NULL )
 	{
-		cur_node = cur_node->getChildren();
+		cur_node = cur_node->getRightSibling(); //get rest children
+		if( cur_node == NULL )
+			break;
 		this->updNodeCnt(cur_node);
 	}
 }

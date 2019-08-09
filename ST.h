@@ -201,6 +201,13 @@ public:
 	 */
 	void updNodeCnts();
 
+	/**
+	 * Updates the value of _occ_num for a given node.
+	 *
+	 * @param cur_node The node.
+	 *
+	 * @author Thanasis Vergoulis
+	 */
 	void updNodeCnt(STnode* cur_node);
 private:
 	//All variables are explained in the javadoc comments of the STnode class.

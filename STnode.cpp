@@ -231,5 +231,4 @@ void STnode::updateSubtreeOccNum()
 	vector<OccPos*> occs;
 	this->getSubtreeOccs(occs);
 	this->_occs_num = occs.size();
-	cout<<"\t cnt = "<<this->_occs_num<<endl;
 }
