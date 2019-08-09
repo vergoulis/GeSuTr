@@ -63,6 +63,7 @@ public:
  * @var _in_label_start Start index of the label of the incoming edge.
  * @var _in_label_end End index of the label of the incoming edge. 
  * @var _occ_positions If leaf this is pointer to all starting positions when the corresponding string/suffix occurs. If not leaf, it is null. 
+ * @var _occs_num The number of occurrences in the subtree below the node. 
  *
  * @author Thanasis Vergoulis
  */
@@ -276,9 +277,16 @@ public:
 	 * @param occs A vector containing pointers to the occurrences (call by reference). Attention! Inpit 
 	 * vector has to be empty.
 	 *
-	 * @authot Thanasis Vergoulis
+	 * @author Thanasis Vergoulis
 	 */
 	void getSubtreeOccs(vector<OccPos*>& occs);
+
+	/**
+	 * Updates the value of _occs_num of the current node.
+	 *
+	 * @author Thanasis Vergoulis
+	 */
+	void updateSubtreeOccNum();
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
 	long _str_id;
@@ -288,5 +296,6 @@ private:
 	long _in_label_start;
 	long _in_label_end;
 	OccPos* _occ_positions; 
+	long _occs_num; 
 };
 #endif /* STNODE_H*/

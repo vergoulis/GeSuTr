@@ -228,7 +228,7 @@ void ST::findStr(string str, vector<OccPos*>& occs)
 
 		if( read_chr == 0 ) //nowhere to go
 			return; //no recorded occurrence
-		
+
 		str_len -= read_chr;
 		str = str.substr(read_chr,str_len);
 	}
@@ -274,14 +274,27 @@ void ST::printNode( STnode* src_node, long depth)
 		cout<<this->_strs[str_id].substr(start,end-start+1)<<"[";
 		src_node->printOccPos();
 		cout<<"]"<<endl;
-
-		
-		//cout<<endl;
 	}
 	//Recursive call for all node1's children
 	while( node2!=NULL)
 	{
 		printNode(node2, depth+1);
 		node2 = node2->getRightSibling();
+	}
+}
+
+void ST::updNodeCnts()
+{
+	this->updNodeCnt(this->_st_root);
+}
+
+void ST::updNodeCnt( STnode* cur_node)
+{
+	cout<<"Updating cnt for node "<<cur_node<<" with in label '"<<this->getLabel(cur_node)<<"'..."<<endl;
+	cur_node->updateSubtreeOccNum();
+	while( cur_node!= NULL )
+	{
+		cur_node = cur_node->getChildren();
+		this->updNodeCnt(cur_node);
 	}
 }

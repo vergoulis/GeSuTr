@@ -194,6 +194,14 @@ public:
 	 */
 	void printNode(STnode* src_node, long depth);
 
+	/**
+	 * Updates the value of _occ_num for all nodes of the tree.
+	 *
+	 * @author Thanasis Vergoulis
+	 */
+	void updNodeCnts();
+
+	void updNodeCnt(STnode* cur_node);
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
 	vector<string> _strs; 

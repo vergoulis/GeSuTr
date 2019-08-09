@@ -37,6 +37,8 @@ STnode::STnode(STnode* parent, long str_id, long start, long end)
 	this->_parent = parent; //get the node's parent in the tree
 	this->_in_label_start = start; //get the start of the incoming edge's label (based on str_id string)
 	this->_in_label_end = end; //get the end of the incoming edge's label (based on str_id string)
+
+	this->_occs_num = 0;
 }
 
 STnode::~STnode(void)
@@ -182,6 +184,9 @@ void STnode::getSubtreeLeaves(vector<STnode*>& leaves)
 {
 	STnode* ch_node = this->getChildren();	//Point to the first child
 
+	if( ch_node == NULL ) //this is a leaf
+		leaves.push_back(this);
+
 	while(ch_node != NULL) 
 	{  
 		if( ch_node->isLeaf() )
@@ -197,6 +202,9 @@ void STnode::getSubtreeOccs(vector<OccPos*>& occs)
 {
 	STnode* ch_node = this->getChildren();	//Point to the first child
 	OccPos* cur_p;
+
+	if( ch_node == NULL ) //this is a leaf
+		occs.push_back(this->_occ_positions);
 
 	while(ch_node != NULL) 
 	{  
@@ -216,4 +224,12 @@ void STnode::getSubtreeOccs(vector<OccPos*>& occs)
 
 		ch_node = ch_node->getRightSibling();	//Check the next sibling
 	}
+}
+
+void STnode::updateSubtreeOccNum()
+{
+	vector<OccPos*> occs;
+	this->getSubtreeOccs(occs);
+	this->_occs_num = occs.size();
+	cout<<"\t cnt = "<<this->_occs_num<<endl;
 }
