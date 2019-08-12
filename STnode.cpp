@@ -39,6 +39,7 @@ STnode::STnode(STnode* parent, long str_id, long start, long end)
 	this->_in_label_end = end; //get the end of the incoming edge's label (based on str_id string)
 
 	this->_occs_num = 0;
+	this->_occ_positions = NULL;
 }
 
 STnode::~STnode(void)
