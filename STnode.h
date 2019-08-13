@@ -287,6 +287,13 @@ public:
 	 * @author Thanasis Vergoulis
 	 */
 	void updateSubtreeOccNum();
+
+	/**
+	 * Get the number of occurrences in the subtree below the node
+	 * @return the _occs_num variable
+	 */
+    long getOccsNum() const;
+
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
 	long _str_id;

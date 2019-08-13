@@ -53,7 +53,7 @@ int ST::strInsertNaive(string str)
 		//this->print(); //DEBUG
 	}
 
-	this->print(); //DEBUG
+	//this->print(); //DEBUG
 	return 0;
 }
 
@@ -248,7 +248,6 @@ string ST::getLabel(STnode* node)
 
 void ST::print(void)
 {
-	cout<<"[~]"<<endl; //print the root
 	this->printNode( this->_st_root, 0);
 }
 
@@ -261,7 +260,11 @@ void ST::printNode( STnode* src_node, long depth)
 	long str_id = src_node->getRefStrId();
 
 	//If depth == 0 (root) then print nothing, just call STprintNode for the first child.
-	if( depth>0)
+	if (depth == 0)
+    {
+	    cout << "[~] (" << src_node->getOccsNum() << ")" << endl;
+    }
+	else
 	{
 		//Print the branches coming from higher nodes
 		while( d>1)
@@ -273,7 +276,7 @@ void ST::printNode( STnode* src_node, long depth)
 		
 		cout<<this->_strs[str_id].substr(start,end-start+1)<<"[";
 		src_node->printOccPos();
-		cout<<"]"<<endl;
+		cout<<"]"<< " (" << src_node->getOccsNum() << ")"<<endl;
 	}
 	//Recursive call for all node1's children
 	while( node2!=NULL)

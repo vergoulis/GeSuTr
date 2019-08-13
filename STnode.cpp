@@ -205,7 +205,17 @@ void STnode::getSubtreeOccs(vector<OccPos*>& occs)
 	OccPos* cur_p;
 
 	if( ch_node == NULL ) //this is a leaf
-		occs.push_back(this->_occ_positions);
+    {
+        // add all starting positions to occs
+        OccPos* cur_p = this->_occ_positions;
+
+        while( cur_p != NULL )
+        {
+            occs.push_back(cur_p);
+            cur_p = cur_p->_next_pos;
+        }
+    }
+
 
 	while(ch_node != NULL) 
 	{  
@@ -232,4 +242,9 @@ void STnode::updateSubtreeOccNum()
 	vector<OccPos*> occs;
 	this->getSubtreeOccs(occs);
 	this->_occs_num = occs.size();
+	//cout << this->_occs_num << endl;
+}
+
+long STnode::getOccsNum() const {
+    return _occs_num;
 }
