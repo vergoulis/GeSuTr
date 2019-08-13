@@ -38,6 +38,9 @@ using namespace std;
 class ST
 {
 public:
+
+    ST() {}
+
 	/** 
 	 * The class constrcutor. It constracts the tree for a given set of strings.
 	 *
