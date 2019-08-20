@@ -69,7 +69,7 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end)
 	STnode* cur_node = this->_st_root;
 	STnode* init_node = this->_st_root;
 	long chars_matched; 
-	string suffix = this->_strs[str_id].substr(suf_start,suf_end);
+	string suffix = this->_strs[str_id].substr(suf_start,suf_end-suf_start+1);
 
 	//Traverse the tree based on the suffix & add nodes where needed
 	long str_len = suffix.length(); //string length
@@ -82,10 +82,11 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end)
 	while(chars_read!=str_len)
 	{
 		remaining_str = suffix.substr(chars_read,str_len-chars_read);
+		//cout<<"To traverse based on '"<<remaining_str<<"'"<<endl; //DEBUG
 		chars_matched = this->traverseNodeNaive(cur_node,remaining_str);
-
 		label_len = cur_node->getInLabelEnd()-cur_node->getInLabelStart()+1;
-		//cout<<"[before: "<<cur_node->getInLabelStart()<<","<<cur_node->getInLabelEnd()<<"] label size = "<<label_len<<endl; //DEBUG	
+
+		//cout<<"Reached node with in label [str="<<cur_node->getRefStrId()<<", st="<<cur_node->getInLabelStart()<<", en="<<cur_node->getInLabelEnd()<<"] label size = "<<label_len<<endl; //DEBUG	
 		//cout<<"--- matched: "<<chars_matched<<", str_len: "<<str_len<<", chars_read: "<<chars_read<<endl; //DEBUG
 
 		if( chars_matched == 0 ) //no character matched - no children with proper label of incoming edge
