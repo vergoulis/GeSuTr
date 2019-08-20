@@ -31,11 +31,13 @@ ST::~ST()
 	//Destruct an object
 }
 
-int ST::strInsertNaive(string str)
+vector<STnode*> ST::strInsertNaive(string str)
 {
-	cout<<"- Inserting string '"<<str<<"' to the string registry..."<<endl;
+    vector<STnode*> acc_nodes; // nodes that are accessed during the insertion
+
+	//cout<<"- Inserting string '"<<str<<"' to the string registry..."<<endl;
 	int str_id = this->strRegister(str); //register str in the registry of strings
-	cout<<"- String inserted..."<<endl;
+	//cout<<"- String inserted..."<<endl;
 
 	string suffix;
 
@@ -47,14 +49,14 @@ int ST::strInsertNaive(string str)
 
 	for( long i=0; i<this->_strs[str_id].length(); i++ )
 	{
-		cout<<"\t - Inserting suffix '"<<this->_strs[str_id].substr(i,this->_strs[str_id].length()-i)<<"' to the tree..."<<endl; //DEBUG
-		this->insertSuffix(str_id,i,this->_strs[str_id].length()-1); //insert the i-th suffix to the tree
-		cout<<"\t - Suffix inserted..."<<endl;
+		//cout<<"\t - Inserting suffix '"<<this->_strs[str_id].substr(i,this->_strs[str_id].length()-i)<<"' to the tree..."<<endl; //DEBUG
+		this->insertSuffix(str_id,i, this->_strs[str_id].length()-1, acc_nodes); //insert the i-th suffix to the tree
+		//cout<<"\t - Suffix inserted..."<<endl;
 		//this->print(); //DEBUG
 	}
 
 	//this->print(); //DEBUG
-	return 0;
+	return acc_nodes;
 }
 
 int ST::strInsertNaive(string* strs, long str_num)
@@ -64,7 +66,7 @@ int ST::strInsertNaive(string* strs, long str_num)
 	return 0; 
 }
 
-int ST::insertSuffix(long str_id, long suf_start, long suf_end)
+int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<STnode*>& acc_nodes)
 {
 	STnode* cur_node = this->_st_root;
 	STnode* init_node = this->_st_root;
@@ -94,7 +96,9 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end)
 			new_node = new STnode(cur_node,str_id,suf_start+chars_read+chars_matched,suf_end); //create new child 
 			new_node->addOccPos(str_id,suf_start); //This is a leaf, so add its info.
 			cur_node->addChild(new_node); //update parent
-			break;
+
+            acc_nodes.push_back(new_node);
+            break;
 		}
 		else if( chars_matched==label_len ) //whole edge was read
 		{
@@ -104,7 +108,9 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end)
 			{
 				cur_node->addOccPos(str_id,suf_start);
 			}
-		}
+
+            acc_nodes.push_back(cur_node);
+        }
 		else
 		{	
 			//cout<<"part of edge matches, chars_read="<<chars_read<<", chars_matched="<<chars_matched<<", suf_start="<<suf_start<<endl; //DEBUG
@@ -119,20 +125,27 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end)
 			cur_node->setOccPos(NULL); //not a leaf anymore
 			//cout<<"[intermediate: "<<cur_node->getInLabelStart()<<","<<cur_node->getInLabelEnd()<<"]"<<endl; //DEBUG
 
-			//create a new node to be the child of the intermediate node
+            acc_nodes.push_back(cur_node);
+
+            //create a new node to be the child of the intermediate node
 			new_node = new STnode(cur_node,old_str_id,cur_node->getInLabelEnd()+1,old_end);
 			new_node->setChildren(end_node_children);
 			new_node->setOccPos(old_leaf_occs); //get the suffix occurrences from the old leaf
 			cur_node->setChildren(new_node); //make this to be the first child
 			//cout<<"[intermediate ch1: "<<new_node->getInLabelStart()<<","<<new_node->getInLabelEnd()<<"]"<<endl; //DEBUG
 
-			//add a new node based on the rest of the str
+            if (old_str_id == str_id) {
+                acc_nodes.push_back(new_node);
+            }
+
+            //add a new node based on the rest of the str
 			new_node = new STnode(cur_node,str_id,suf_start+chars_read+chars_matched,suf_end);
 			new_node->addOccPos(str_id,suf_start); //add new suffix occurrence
 			cur_node->addChild(new_node); //add this as an extra child
 			//cout<<"[intermediate ch2: "<<new_node->getInLabelStart()<<","<<new_node->getInLabelEnd()<<"]"<<endl; //DEBUG
 
-			break;
+            acc_nodes.push_back(new_node);
+            break;
 		}
 		chars_read += chars_matched; 
 	}
@@ -284,6 +297,32 @@ void ST::printNode( STnode* src_node, long depth)
 		printNode(node2, depth+1);
 		node2 = node2->getRightSibling();
 	}
+}
+
+pair<string, int> ST::getSubstrAndOccCount(STnode* src_node)
+{
+    vector<STnode*> path;
+
+    // find all nodes up to the root
+    while (src_node != this->_st_root) {
+        path.insert(path.begin(), src_node);
+        src_node = src_node->getParent();
+    }
+
+    // construct full substring, based on the path from the root
+    stringstream ss;
+
+    for (unsigned int i = 0; i < path.size(); i++) {
+        src_node = path[i];
+
+        long start = src_node->getInLabelStart();
+        long end = src_node->getInLabelEnd();
+        long str_id = src_node->getRefStrId();
+
+        ss << this->_strs[str_id].substr(start, end - start + 1);
+    }
+
+    return make_pair(ss.str(), src_node->getOccsNum());
 }
 
 void ST::updNodeCnts()

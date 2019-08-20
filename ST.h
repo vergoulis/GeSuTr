@@ -24,6 +24,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 #include "STnode.h"
 using namespace std;
 
@@ -61,11 +62,11 @@ public:
 	 *
 	 * @param str The string to be inserted. 
 	 *
-	 * @return It returns 0 on success.
+	 * @return vector of STnode pointers with the nodes that have been accessed during insertion.
 	 *
 	 * @author Thanasis Vergoulis
 	 */
-	int strInsertNaive(string str);
+    vector<STnode*> strInsertNaive(string str);
 
 	/**
 	 * Inserts one-by-one the strings contained in a given array to the tree. It calls strInsertNaive() multiple times. 
@@ -88,7 +89,7 @@ public:
 	 *
 	 * @return It returns 0 on success. 
 	 */
-	int insertSuffix(long str_id, long suf_start, long suf_end);
+	int insertSuffix(long str_id, long suf_start, long suf_end, vector<STnode*>& acc_nodes);
 
 	/**
 	 * Inserts a given string in the registry (vector) of strings. 
@@ -196,6 +197,13 @@ public:
 	 * @author Thanasis Vergoulis
 	 */
 	void printNode(STnode* src_node, long depth);
+
+    /**
+     * Supporting function to get substring of a node and its occurrences count
+     *
+     * @param src_node The pointer to the node
+     */
+	pair<string, int> getSubstrAndOccCount(STnode *src_node);
 
 	/**
 	 * Updates the value of _occ_num for all nodes of the tree.
