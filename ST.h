@@ -41,7 +41,12 @@ class ST
 {
 public:
 
-    ST() {}
+	/**
+	 * An empty class constructor. It just initialises the root to NULL.
+	 *
+	 * @author Thanasis Vergoulis
+	 */
+    ST();
 
 	/** 
 	 * The class constrcutor. It constracts the tree for a given set of strings.
