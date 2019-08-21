@@ -118,8 +118,10 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end)
 			//create new (intermediate) node (inital's node, new child)
 			new_node = new STnode(cur_node->getParent(),cur_node->getRefStrId(),cur_node->getInLabelStart(),cur_node->getInLabelStart()+chars_matched-1);
 			new_node->setRightSibling(cur_node->getRightSibling()); //the right sibling of old node, becomes the right of this
-			if( pre_node != NULL ) //if there is a sibling at the left, fix its right sibling pointer
-				pre_node->setRightSibling(new_node);
+			if( pre_node != NULL ) 
+				pre_node->setRightSibling(new_node); //if there is a sibling at the left, fix its right sibling pointer
+			else
+				cur_node->getParent()->setChildren(new_node); //if not, fix the pointer to the first child of the parent
 			//cout<<"=> new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
 			//update old child of the initial node, to be child of the new (intermediate) node
