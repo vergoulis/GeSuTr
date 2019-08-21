@@ -20,6 +20,11 @@
 
 #include "ST.h"
 
+ST::ST()
+{
+	this->_st_root=NULL;
+}
+
 ST::ST(string* strs, long strs_num)
 {
 	this->_st_root = new STnode(NULL,0,0,strs[0].length()-1); //create root node
@@ -42,7 +47,7 @@ int ST::strInsertNaive(string str)
 	if( this->_st_root == NULL) //empty tree - build from scratch
 	{
 		//Create and initialise the root node (no parent, no label)
-		this->_st_root = new STnode(NULL,str_id,-1,-1); 
+		this->_st_root = new STnode(NULL,str_id,0,str.length()-1); 
 	}
 
 	for( long i=0; i<this->_strs[str_id].length(); i++ )
