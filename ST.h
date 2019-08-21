@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <map>
 #include "STnode.h"
 using namespace std;
 
@@ -66,7 +67,7 @@ public:
 	 *
 	 * @author Thanasis Vergoulis
 	 */
-    vector<STnode*> strInsertNaive(string str);
+    map<string, STnode*> strInsertNaive(string str);
 
 	/**
 	 * Inserts one-by-one the strings contained in a given array to the tree. It calls strInsertNaive() multiple times. 
@@ -89,7 +90,7 @@ public:
 	 *
 	 * @return It returns 0 on success. 
 	 */
-	int insertSuffix(long str_id, long suf_start, long suf_end, vector<STnode*>& acc_nodes);
+	int insertSuffix(long str_id, long suf_start, long suf_end, map<string, STnode*>& acc_nodes);
 
 	/**
 	 * Inserts a given string in the registry (vector) of strings. 

@@ -31,9 +31,9 @@ ST::~ST()
 	//Destruct an object
 }
 
-vector<STnode*> ST::strInsertNaive(string str)
+map<string, STnode*> ST::strInsertNaive(string str)
 {
-    vector<STnode*> acc_nodes; // nodes that are accessed during the insertion
+    map<string, STnode*> acc_nodes; // nodes that are accessed during the insertion
 
 	//cout<<"- Inserting string '"<<str<<"' to the string registry..."<<endl;
 	int str_id = this->strRegister(str); //register str in the registry of strings
@@ -49,9 +49,9 @@ vector<STnode*> ST::strInsertNaive(string str)
 
 	for( long i=0; i<this->_strs[str_id].length(); i++ )
 	{
-		//cout<<"\t - Inserting suffix '"<<this->_strs[str_id].substr(i,this->_strs[str_id].length()-i)<<"' to the tree..."<<endl; //DEBUG
+		cout<<"\t - Inserting suffix '"<<this->_strs[str_id].substr(i,this->_strs[str_id].length()-i)<<"' to the tree..."<<endl; //DEBUG
 		this->insertSuffix(str_id,i, this->_strs[str_id].length()-1, acc_nodes); //insert the i-th suffix to the tree
-		//cout<<"\t - Suffix inserted..."<<endl;
+		cout<<"\t - Suffix inserted..."<<endl;
 		//this->print(); //DEBUG
 	}
 
@@ -66,7 +66,7 @@ int ST::strInsertNaive(string* strs, long str_num)
 	return 0; 
 }
 
-int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<STnode*>& acc_nodes)
+int ST::insertSuffix(long str_id, long suf_start, long suf_end, map<string, STnode*>& acc_nodes)
 {
 	STnode* cur_node = this->_st_root;
 	STnode* init_node = this->_st_root;
@@ -98,19 +98,35 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<STnode*>&
 			new_node->addOccPos(str_id,suf_start); //This is a leaf, so add its info.
 			cur_node->addChild(new_node); //update parent
 
-            acc_nodes.push_back(new_node);
+            cout << "\t\t1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size()) << endl;
+            string substring = this->_strs[str_id].substr(suf_start, this->_strs[str_id].size());
+            acc_nodes.insert(make_pair(substring, new_node));
+
             break;
 		}
 		else if( chars_matched==label_len ) //whole edge was read
 		{
+
 			//cout<<"whole edge was read"<<endl; //DEBUG
 			//cout<<"[current: "<<cur_node->getInLabelStart()<<","<<cur_node->getInLabelEnd()<<"]"<<endl; //DEBUG
 			if( cur_node->isLeaf() )
 			{
 				cur_node->addOccPos(str_id,suf_start);
-			}
+				//cout << suffix << " " << suf_start << " " << suf_end << " " << suffix.substr(suf_start, suf_end) << endl;
 
-            acc_nodes.push_back(cur_node);
+                cout << "\t\t2.1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size()) << endl;
+                string substring = this->_strs[str_id].substr(suf_start, this->_strs[str_id].size());
+                acc_nodes.insert(make_pair(substring, cur_node));
+
+            } else {
+			    //cout << chars_read << " + " << chars_matched << endl;
+                cout << "\t\t2.2) visiting node " << this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << endl;
+
+                string substring = this->_strs[str_id].substr(suf_start, chars_read + chars_matched);
+                acc_nodes.insert(make_pair(substring, cur_node));
+            }
+
+            //acc_nodes.push_back(cur_node);
         }
 		else
 		{	
@@ -126,7 +142,9 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<STnode*>&
 			cur_node->setOccPos(NULL); //not a leaf anymore
 			//cout<<"[intermediate: "<<cur_node->getInLabelStart()<<","<<cur_node->getInLabelEnd()<<"]"<<endl; //DEBUG
 
-            acc_nodes.push_back(cur_node);
+            cout << "\t\t3.1) visiting node " << this->_strs[old_str_id].substr(suf_start, cur_node->getInLabelLength()) << endl;
+            string substring = this->_strs[old_str_id].substr(suf_start, cur_node->getInLabelLength());
+            acc_nodes.insert(make_pair(substring, cur_node));
 
             //create a new node to be the child of the intermediate node
 			new_node = new STnode(cur_node,old_str_id,cur_node->getInLabelEnd()+1,old_end);
@@ -135,9 +153,18 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<STnode*>&
 			cur_node->setChildren(new_node); //make this to be the first child
 			//cout<<"[intermediate ch1: "<<new_node->getInLabelStart()<<","<<new_node->getInLabelEnd()<<"]"<<endl; //DEBUG
 
-            if (old_str_id == str_id) {
-                acc_nodes.push_back(new_node);
+            // if this substring is already visited, we should update is reference
+            substring = this->_strs[old_str_id].substr(cur_node->getInLabelStart(), old_end);
+
+            cout << "\t\t3.2) changing ref of node " << this->_strs[old_str_id].substr(cur_node->getInLabelStart(), old_end) << endl;
+
+            std::map<string, STnode*>::iterator it = acc_nodes.find(substring);
+            if (it != acc_nodes.end()) {
+                cout << "\t\t3.2) changing ref of node " << this->_strs[old_str_id].substr(cur_node->getInLabelStart(), old_end) << endl;
+
+                it->second = new_node;
             }
+
 
             //add a new node based on the rest of the str
 			new_node = new STnode(cur_node,str_id,suf_start+chars_read+chars_matched,suf_end);
@@ -145,7 +172,10 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<STnode*>&
 			cur_node->addChild(new_node); //add this as an extra child
 			//cout<<"[intermediate ch2: "<<new_node->getInLabelStart()<<","<<new_node->getInLabelEnd()<<"]"<<endl; //DEBUG
 
-            acc_nodes.push_back(new_node);
+            cout << "\t\t3.3) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << endl;
+            substring = this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1);
+            acc_nodes.insert(make_pair(substring, new_node));
+
             break;
 		}
 		chars_read += chars_matched; 
@@ -276,7 +306,7 @@ void ST::printNode( STnode* src_node, long depth)
 	//If depth == 0 (root) then print nothing, just call STprintNode for the first child.
 	if (depth == 0)
     {
-	    cout << "[~] (" << src_node->getOccsNum() << ")" << endl;
+	    cout << "[~] (" << src_node->getOccsNum() << ")" << " " << src_node << endl;
     }
 	else
 	{
@@ -290,7 +320,7 @@ void ST::printNode( STnode* src_node, long depth)
 		
 		cout<<this->_strs[str_id].substr(start,end-start+1)<<"[";
 		src_node->printOccPos();
-		cout<<"]"<< " (" << src_node->getOccsNum() << ")"<<endl;
+		cout<<"]"<< " (" << src_node->getOccsNum() << ")"<< " " << src_node << endl;
 	}
 	//Recursive call for all node1's children
 	while( node2!=NULL)
@@ -310,6 +340,11 @@ pair<string, int> ST::getSubstrAndOccCount(STnode* src_node)
         src_node = src_node->getParent();
     }
 
+    if (path.size() == 3) {
+        for(int i = 0; i< path.size(); i++) {
+            cout << path[i] << endl;
+        }
+    }
     // construct full substring, based on the path from the root
     stringstream ss;
 
