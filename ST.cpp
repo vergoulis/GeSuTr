@@ -74,7 +74,8 @@ int ST::strInsertNaive(string* strs, long str_num)
 int ST::insertSuffix(long str_id, long suf_start, long suf_end, map<string, STnode*>& acc_nodes)
 {
 	STnode* cur_node = this->_st_root;
-	STnode* init_node = this->_st_root;
+	STnode* pre_node; //auxiliary variable for previous sibling node
+	//STnode* init_node = this->_st_root;
 	long chars_matched; 
 	string suffix = this->_strs[str_id].substr(suf_start,suf_end-suf_start+1);
 
@@ -90,7 +91,7 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, map<string, STno
 	{
 		remaining_str = suffix.substr(chars_read,str_len-chars_read);
 		//cout<<"To traverse based on '"<<remaining_str<<"'"<<endl; //DEBUG
-		chars_matched = this->traverseNodeNaive(cur_node,remaining_str);
+		chars_matched = this->traverseNodeNaive(cur_node,remaining_str,pre_node);
 		label_len = cur_node->getInLabelEnd()-cur_node->getInLabelStart()+1;
 
 		//cout<<"Reached node with in label [str="<<cur_node->getRefStrId()<<", st="<<cur_node->getInLabelStart()<<", en="<<cur_node->getInLabelEnd()<<"] label size = "<<label_len<<endl; //DEBUG	
@@ -136,46 +137,25 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, map<string, STno
 		else
 		{	
 			//cout<<"part of edge matches, chars_read="<<chars_read<<", chars_matched="<<chars_matched<<", suf_start="<<suf_start<<endl; //DEBUG
-			//get details from old end-node to use them 
-			STnode* end_node_children = cur_node->getChildren();
-			long old_end = cur_node->getInLabelEnd();
-			long old_str_id = cur_node->getRefStrId();
-			OccPos* old_leaf_occs = cur_node->getOccPos(); //leaf's suffix occurrences (it will not be a leaf anymore)
-			
-			//change the old end-node to become the new init node's (intermediate) child
-			cur_node->setInLabelEnd(cur_node->getInLabelStart()+chars_matched-1);
-			cur_node->setOccPos(NULL); //not a leaf anymore
-			//cout<<"[intermediate: "<<cur_node->getInLabelStart()<<","<<cur_node->getInLabelEnd()<<"]"<<endl; //DEBUG
+			//create new (intermediate) node (inital's node, new child)
+			new_node = new STnode(cur_node->getParent(),cur_node->getRefStrId(),cur_node->getInLabelStart(),cur_node->getInLabelStart()+chars_matched-1);
+			new_node->setRightSibling(cur_node->getRightSibling()); //the right sibling of old node, becomes the right of this
+			if( pre_node != NULL ) //if there is a sibling at the left, fix its right sibling pointer
+				pre_node->setRightSibling(new_node);
+			//cout<<"=> new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
-            cout << "\t\t3.1) visiting node " << this->_strs[old_str_id].substr(suf_start, cur_node->getInLabelLength()) << endl;
-            string substring = this->_strs[old_str_id].substr(suf_start, cur_node->getInLabelLength());
-            acc_nodes.insert(make_pair(substring, cur_node));
+			//update old child of the initial node, to be child of the new (intermediate) node
+			cur_node->setInLabelStart(new_node->getInLabelEnd()+1);
+			cur_node->setParent(new_node);
+			new_node->setChildren(cur_node);
+			//cout<<"=> old intermediate updated: "<<cur_node<<" [str: "<<cur_node->getRefStrId()<<", st: "<<cur_node->getInLabelStart()<<", en: "<<cur_node->getInLabelEnd()<<", par: "<<cur_node->getParent()<<"]"<<endl; //DEBUG
 
-            //create a new node to be the child of the intermediate node
-			new_node = new STnode(cur_node,old_str_id,cur_node->getInLabelEnd()+1,old_end);
-			new_node->setChildren(end_node_children);
-			new_node->setOccPos(old_leaf_occs); //get the suffix occurrences from the old leaf
-			cur_node->setChildren(new_node); //make this to be the first child
-			//cout<<"[intermediate ch1: "<<new_node->getInLabelStart()<<","<<new_node->getInLabelEnd()<<"]"<<endl; //DEBUG
+			//create new child of the new intermediate node (based on the remaining str)
+			new_node = new STnode(cur_node->getParent(),str_id,suf_start+chars_read+chars_matched,suf_end);
 
-            // if this substring is already visited, we should update is reference
-            substring = this->_strs[old_str_id].substr(cur_node->getInLabelStart(), old_end);
-
-            cout << "\t\t3.2) changing ref of node " << this->_strs[old_str_id].substr(cur_node->getInLabelStart(), old_end) << endl;
-
-            std::map<string, STnode*>::iterator it = acc_nodes.find(substring);
-            if (it != acc_nodes.end()) {
-                cout << "\t\t3.2) changing ref of node " << this->_strs[old_str_id].substr(cur_node->getInLabelStart(), old_end) << endl;
-
-                it->second = new_node;
-            }
-
-
-            //add a new node based on the rest of the str
-			new_node = new STnode(cur_node,str_id,suf_start+chars_read+chars_matched,suf_end);
 			new_node->addOccPos(str_id,suf_start); //add new suffix occurrence
-			cur_node->addChild(new_node); //add this as an extra child
-			//cout<<"[intermediate ch2: "<<new_node->getInLabelStart()<<","<<new_node->getInLabelEnd()<<"]"<<endl; //DEBUG
+			cur_node->setRightSibling(new_node); //update the right sibling of old node to show the new child
+			//cout<<"=> new child of new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
             cout << "\t\t3.3) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << endl;
             substring = this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1);
@@ -250,6 +230,41 @@ long ST::traverseNodeNaive( STnode*& node, string str)
 	return chars_matched;
 }
 
+long ST::traverseNodeNaive( STnode*& node, string str, STnode*& pre_node)
+{
+	long chars_matched; //number of label matching characters between str's prefix and a proper edge
+	long str_len, label_len; 
+
+//	STnode* next_node = findChildByStr(node,str[0]); //find child having label of incoming edge starting with str[0]
+	STnode* next_node = findChildByStr(node,str[0],pre_node); //find child having label of incoming edge starting with str[0]
+
+
+	if( next_node == NULL ) //no such child
+	{
+		return 0; //no characters found
+	}
+
+	chars_matched = 1; //1st character was matching
+	node = next_node; //this is the node where the selected edge ends
+
+	str_len = str.length();
+	label_len = node->getInLabelLength();
+
+	if( str_len < label_len)
+		label_len = str_len;
+
+	while( chars_matched<label_len )
+	{
+		if( getLabelChar(node,chars_matched)!=str[chars_matched] )
+		{
+			break;
+		}
+		chars_matched++; //prepare to read the next character (hope that it matches)
+	}
+
+	return chars_matched;
+}
+
 STnode* ST::findChildByStr(STnode* node, char character)
 {
 	STnode* ch_node = node->getChildren();	//Point to the first child
@@ -259,6 +274,23 @@ STnode* ST::findChildByStr(STnode* node, char character)
 		if( this->getLabelChar(ch_node,0)== character )
 			return ch_node;
 
+		ch_node = ch_node->getRightSibling();	//Check the next sibling
+	}
+
+	return NULL; //no proper sibling found
+}
+
+STnode* ST::findChildByStr(STnode* node, char character, STnode*& pre_node)
+{
+	STnode* ch_node = node->getChildren();	//Point to the first child
+	pre_node = NULL; 
+
+	while(ch_node != NULL)
+	{  
+		if( this->getLabelChar(ch_node,0)== character )
+			return ch_node;
+
+		pre_node = ch_node; 
 		ch_node = ch_node->getRightSibling();	//Check the next sibling
 	}
 

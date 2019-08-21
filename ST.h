@@ -143,6 +143,23 @@ public:
 	long traverseNodeNaive( STnode*& node, string str);
 
 	/**
+	 * Use str to go down from a given (initial) node. After the execution, param 'node' (is accessed by 
+	 * reference) will  point:
+	 *    (a) to the initial node (if no outgoing edge matching a prefix of str was found), or
+	 *    (b) to the end-node of the matching outgoing edge (the end-node is a child of the init node)
+	 * This is a variant of the basic function that also return the left sibling of the node.
+	 *
+	 * @param node Pointer to the initial node (by reference).  
+	 * @param str The string used for the traversal.
+	 * @param pre_node Pointer to the left sibling of the node (by reference). 
+	 *
+	 * @return The number of matching characters between the prefix of str and the matching edge (if any).
+	 *
+	 * @author Thanasis Vergoulis
+	 */
+	long traverseNodeNaive( STnode*& node, string str, STnode*& pre_node);
+
+	/**
 	 * Finds a child's node having label of incoming edge starting with a given character.
 	 *
 	 * @param node Pointer to the initial node. 
@@ -153,6 +170,22 @@ public:
 	 * @author Thanasis Vergoulis
 	 */
 	STnode* findChildByStr(STnode* node, char character);
+
+	/**
+	 * Finds a child's node having label of incoming edge starting with a given character.
+	 * This variant also returns (based on a parameter by reference) the previous child of 
+	 * the node (i.e., the one to the left of the returned node). This needed for particular
+	 * use in another place of the code. 
+	 *
+	 * @param node Pointer to the initial node. 
+	 * @param character The given character. 
+	 * @param pre_node The sibling at the left of the node (call by reference). 
+	 *
+	 * @return Pointer to the child node that has the desired property. NULL pointer otherwise.  
+	 *
+	 * @author Thanasis Vergoulis
+	 */
+	STnode* findChildByStr(STnode* node, char character, STnode*& pre_node);
 
 	/**
 	 * Returns a pointer to a set of positions in which a particular query string occurs (exact occurrence).
