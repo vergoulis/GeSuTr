@@ -105,7 +105,9 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo>
 			cur_node->addChild(new_node); //update parent
 
             cout << "\t\t1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size() - suf_start) << endl;
-            acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size() - suf_start, new_node);
+            if (new_node->getInLabelEnd() - new_node->getInLabelStart() != 0) {
+                acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size() - suf_start, new_node);
+            }
 
             break;
 		}
@@ -120,16 +122,16 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo>
 				//cout << suffix << " " << suf_start << " " << suf_end << " " << suffix.substr(suf_start, suf_end) << endl;
 
                 cout << "\t\t2.1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size() - suf_start) << endl;
-                acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size() - suf_start, cur_node);
+                if (cur_node->getInLabelStart() - cur_node->getInLabelEnd() != 0) {
+                    acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size() - suf_start, cur_node);
+                }
 
             } else {
 			    //cout << chars_read << " + " << chars_matched << endl;
                 cout << "\t\t2.2) visiting node " << this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << endl;
                 acc_nodes.emplace_back(str_id, suf_start, chars_read + chars_matched, cur_node);
             }
-
-            //acc_nodes.push_back(cur_node);
-        }
+		}
 		else
 		{	
 			//cout<<"part of edge matches, chars_read="<<chars_read<<", chars_matched="<<chars_matched<<", suf_start="<<suf_start<<endl; //DEBUG
@@ -157,8 +159,10 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo>
 			cur_node->setRightSibling(new_node); //update the right sibling of old node to show the new child
 			//cout<<"=> new child of new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
-            cout << "\t\t3.2) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << " (new node - after split - lower)" << endl;
-            acc_nodes.emplace_back(str_id, suf_start, suf_end - suf_start + 1, new_node);
+			cout << "\t\t3.2) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << " (new node - after split - lower)" << endl;
+			if (new_node->getInLabelEnd() - new_node->getInLabelStart() != 0) {
+                acc_nodes.emplace_back(str_id, suf_start, suf_end - suf_start + 1, new_node);
+            }
 
             break;
 		}
