@@ -36,9 +36,9 @@ ST::~ST()
 	//Destruct an object
 }
 
-map<string, STnode*> ST::strInsertNaive(string str)
+vector<NodeInfo> ST::strInsertNaive(string str)
 {
-    map<string, STnode*> acc_nodes; // nodes that are accessed during the insertion
+    vector<NodeInfo> acc_nodes; // nodes that are accessed during the insertion
 
 	//cout<<"- Inserting string '"<<str<<"' to the string registry..."<<endl;
 	int str_id = this->strRegister(str); //register str in the registry of strings
@@ -71,7 +71,7 @@ int ST::strInsertNaive(string* strs, long str_num)
 	return 0; 
 }
 
-int ST::insertSuffix(long str_id, long suf_start, long suf_end, map<string, STnode*>& acc_nodes)
+int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo> & acc_nodes)
 {
 	STnode* cur_node = this->_st_root;
 	STnode* pre_node; //auxiliary variable for previous sibling node
@@ -105,8 +105,7 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, map<string, STno
 			cur_node->addChild(new_node); //update parent
 
             cout << "\t\t1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size()) << endl;
-            string substring = this->_strs[str_id].substr(suf_start, this->_strs[str_id].size());
-            acc_nodes.insert(make_pair(substring, new_node));
+            acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size(), new_node);
 
             break;
 		}
@@ -121,15 +120,12 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, map<string, STno
 				//cout << suffix << " " << suf_start << " " << suf_end << " " << suffix.substr(suf_start, suf_end) << endl;
 
                 cout << "\t\t2.1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size()) << endl;
-                string substring = this->_strs[str_id].substr(suf_start, this->_strs[str_id].size());
-                acc_nodes.insert(make_pair(substring, cur_node));
+                acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size(), cur_node);
 
             } else {
 			    //cout << chars_read << " + " << chars_matched << endl;
                 cout << "\t\t2.2) visiting node " << this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << endl;
-
-                string substring = this->_strs[str_id].substr(suf_start, chars_read + chars_matched);
-                acc_nodes.insert(make_pair(substring, cur_node));
+                acc_nodes.emplace_back(str_id, suf_start, chars_read + chars_matched, cur_node);
             }
 
             //acc_nodes.push_back(cur_node);
@@ -147,10 +143,9 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, map<string, STno
 			//cout<<"=> new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
 			cout<<"\t\t3.1) visiting node "<< this->_strs[str_id].substr(suf_start, chars_matched) << " (new node - after split - upper)" << endl;
-			string substring = this->_strs[str_id].substr(suf_start, chars_matched);
-			acc_nodes.insert(make_pair(substring, new_node));
+            acc_nodes.emplace_back(str_id, suf_start, chars_matched, new_node);
 
-			//update old child of the initial node, to be child of the new (intermediate) node
+            //update old child of the initial node, to be child of the new (intermediate) node
 			cur_node->setInLabelStart(new_node->getInLabelEnd()+1);
 			cur_node->setParent(new_node);
 			new_node->setChildren(cur_node);
@@ -163,8 +158,7 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, map<string, STno
 			//cout<<"=> new child of new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
             cout << "\t\t3.2) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << " (new node - after split - lower)" << endl;
-            substring = this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1);
-            acc_nodes.insert(make_pair(substring, new_node));
+            acc_nodes.emplace_back(str_id, suf_start, suf_end - suf_start + 1, new_node);
 
             break;
 		}
