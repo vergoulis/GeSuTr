@@ -424,3 +424,13 @@ void ST::updNodeCnt( STnode* cur_node)
 		this->updNodeCnt(cur_node);
 	}
 }
+
+string ST::getRegStr(long str_id)
+{
+	return this->_strs[str_id];
+}
+
+string ST::getRegSubStr(long str_id, long str_start, long str_len)
+{
+	return this->_strs[str_id].substr(str_start,str_len);
+}
