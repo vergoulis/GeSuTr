@@ -250,6 +250,30 @@ public:
 	 * @author Thanasis Vergoulis
 	 */
 	void updNodeCnt(STnode* cur_node);
+
+	/**
+	 * Returns the string in the registry having as identifier str_id. 
+	 *
+	 * @param str_id The identifier of the string in the registry. 
+	 *
+	 * @return The string. 
+	 *
+	 * @author Thanasis Vergoulis
+	 */
+	string getRegStr(long str_id);
+
+	/**
+	 * Returns a substring of a string in the registry. 
+	 *
+	 * @param str_id The identifier of the string in the registry.
+	 * @param str_start The starting point of the substring.
+	 * @param str_len The length of the substring.
+	 *
+	 * @return The substring. 
+	 *
+	 * @author Thanasis Vergoulis
+	 */
+	string getRegSubStr(long str_id, long str_start, long str_len);
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
 	vector<string> _strs; 
