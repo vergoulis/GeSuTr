@@ -142,8 +142,8 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo>
 				cur_node->getParent()->setChildren(new_node); //if not, fix the pointer to the first child of the parent
 			//cout<<"=> new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
-			cout<<"\t\t3.1) visiting node "<< this->_strs[str_id].substr(suf_start, chars_matched) << " (new node - after split - upper)" << endl;
-            acc_nodes.emplace_back(str_id, suf_start, chars_matched, new_node);
+			cout<<"\t\t3.1) visiting node "<< this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << " (new node - after split - upper)" << endl;
+            acc_nodes.emplace_back(str_id, suf_start, chars_read + chars_matched, new_node);
 
             //update old child of the initial node, to be child of the new (intermediate) node
 			cur_node->setInLabelStart(new_node->getInLabelEnd()+1);
