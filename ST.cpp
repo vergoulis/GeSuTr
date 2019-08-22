@@ -104,8 +104,8 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo>
 			new_node->addOccPos(str_id,suf_start); //This is a leaf, so add its info.
 			cur_node->addChild(new_node); //update parent
 
-            cout << "\t\t1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size()) << endl;
-            acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size(), new_node);
+            cout << "\t\t1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size() - suf_start) << endl;
+            acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size() - suf_start, new_node);
 
             break;
 		}
@@ -119,8 +119,8 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo>
 				cur_node->addOccPos(str_id,suf_start);
 				//cout << suffix << " " << suf_start << " " << suf_end << " " << suffix.substr(suf_start, suf_end) << endl;
 
-                cout << "\t\t2.1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size()) << endl;
-                acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size(), cur_node);
+                cout << "\t\t2.1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size() - suf_start) << endl;
+                acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size() - suf_start, cur_node);
 
             } else {
 			    //cout << chars_read << " + " << chars_matched << endl;
