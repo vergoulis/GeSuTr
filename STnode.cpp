@@ -44,6 +44,7 @@ STnode::STnode(STnode* parent, long str_id, long start, long end)
 
 STnode::~STnode(void)
 {
+    cout << "node deleted" << endl;
 }
 
 void STnode::addChild(STnode* ch)
@@ -247,4 +248,12 @@ void STnode::updateSubtreeOccNum()
 
 long STnode::getOccsNum() const {
     return _occs_num;
+}
+
+void STnode::setCachedResult(TransitionMatrix *cachedResult) {
+    _cached_result = cachedResult;
+}
+
+TransitionMatrix *STnode::getCachedResult() const {
+    return _cached_result;
 }

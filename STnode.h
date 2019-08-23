@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <vector>
+#include "../../TransitionMatrix/TransitionMatrix.h"
 using namespace std;
 
 /**
@@ -64,6 +65,7 @@ public:
  * @var _in_label_end End index of the label of the incoming edge. 
  * @var _occ_positions If leaf this is pointer to all starting positions when the corresponding string/suffix occurs. If not leaf, it is null. 
  * @var _occs_num The number of occurrences in the subtree below the node. 
+ * @var _cached_result Pointer to an intermediate cached result
  *
  * @author Thanasis Vergoulis
  */
@@ -294,6 +296,18 @@ public:
 	 */
     long getOccsNum() const;
 
+    /**
+     * Setter of the intermediate cached result of the node
+     * @param cachedResult the result to be cached
+     */
+    void setCachedResult(TransitionMatrix *cachedResult);
+
+    /**
+     * Getter of the intermediate cached result of the node
+     * @return the cached result (if any) or nullptr
+     */
+    TransitionMatrix *getCachedResult() const;
+
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
 	long _str_id;
@@ -303,6 +317,8 @@ private:
 	long _in_label_start;
 	long _in_label_end;
 	OccPos* _occ_positions; 
-	long _occs_num; 
+	long _occs_num;
+
+	TransitionMatrix* _cached_result { nullptr };
 };
 #endif /* STNODE_H*/

@@ -34,6 +34,7 @@ ST::ST(string* strs, long strs_num)
 ST::~ST()
 {
 	//Destruct an object
+    cout << "tree deleted" << endl;
 }
 
 vector<NodeInfo> ST::strInsertNaive(string str)
@@ -54,9 +55,9 @@ vector<NodeInfo> ST::strInsertNaive(string str)
 
 	for( long i=0; i<this->_strs[str_id].length(); i++ )
 	{
-		cout<<"\t - Inserting suffix '"<<this->_strs[str_id].substr(i,this->_strs[str_id].length()-i)<<"' to the tree..."<<endl; //DEBUG
+		//cout<<"\t - Inserting suffix '"<<this->_strs[str_id].substr(i,this->_strs[str_id].length()-i)<<"' to the tree..."<<endl; //DEBUG
 		this->insertSuffix(str_id,i, this->_strs[str_id].length()-1, acc_nodes); //insert the i-th suffix to the tree
-		cout<<"\t - Suffix inserted..."<<endl;
+		//cout<<"\t - Suffix inserted..."<<endl;
 		//this->print(); //DEBUG
 	}
 
@@ -104,7 +105,7 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo>
 			new_node->addOccPos(str_id,suf_start); //This is a leaf, so add its info.
 			cur_node->addChild(new_node); //update parent
 
-            cout << "\t\t1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size() - suf_start) << endl;
+            //cout << "\t\t1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size() - suf_start) << endl;
             if (new_node->getInLabelEnd() - new_node->getInLabelStart() != 0) {
                 acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size() - suf_start, new_node);
             }
@@ -121,14 +122,14 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo>
 				cur_node->addOccPos(str_id,suf_start);
 				//cout << suffix << " " << suf_start << " " << suf_end << " " << suffix.substr(suf_start, suf_end) << endl;
 
-                cout << "\t\t2.1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size() - suf_start) << endl;
+                //cout << "\t\t2.1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size() - suf_start) << endl;
                 if (cur_node->getInLabelStart() - cur_node->getInLabelEnd() != 0) {
                     acc_nodes.emplace_back(str_id, suf_start, this->_strs[str_id].size() - suf_start, cur_node);
                 }
 
             } else {
 			    //cout << chars_read << " + " << chars_matched << endl;
-                cout << "\t\t2.2) visiting node " << this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << endl;
+                //cout << "\t\t2.2) visiting node " << this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << endl;
                 acc_nodes.emplace_back(str_id, suf_start, chars_read + chars_matched, cur_node);
             }
 		}
@@ -144,7 +145,7 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo>
 				cur_node->getParent()->setChildren(new_node); //if not, fix the pointer to the first child of the parent
 			//cout<<"=> new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
-			cout<<"\t\t3.1) visiting node "<< this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << " (new node - after split - upper)" << endl;
+			//cout<<"\t\t3.1) visiting node "<< this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << " (new node - after split - upper)" << endl;
             acc_nodes.emplace_back(str_id, suf_start, chars_read + chars_matched, new_node);
 
             //update old child of the initial node, to be child of the new (intermediate) node
@@ -159,7 +160,7 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo>
 			cur_node->setRightSibling(new_node); //update the right sibling of old node to show the new child
 			//cout<<"=> new child of new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
-			cout << "\t\t3.2) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << " (new node - after split - lower)" << endl;
+			//cout << "\t\t3.2) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << " (new node - after split - lower)" << endl;
 			if (new_node->getInLabelEnd() - new_node->getInLabelStart() != 0) {
                 acc_nodes.emplace_back(str_id, suf_start, suf_end - suf_start + 1, new_node);
             }
