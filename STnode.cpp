@@ -44,7 +44,7 @@ STnode::STnode(STnode* parent, long str_id, long start, long end)
 
 STnode::~STnode(void)
 {
-    cout << "node deleted" << endl;
+    //cout << "node deleted" << endl;
 }
 
 void STnode::addChild(STnode* ch)
