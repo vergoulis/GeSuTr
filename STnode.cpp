@@ -257,7 +257,7 @@ void STnode::setCachedResult(c_key key, TransitionMatrix *cachedResult) {
 }
 
 TransitionMatrix *STnode::getCachedResult(c_key key) const {
-    Utils::printConstraint(key);
+    // Utils::printConstraint(key);
 
     auto result = this->_cached_results.find(key);
     if (result != this->_cached_results.end()) {

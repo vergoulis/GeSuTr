@@ -172,7 +172,7 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 			cur_node->setRightSibling(new_node); //update the right sibling of old node to show the new child
 			//cout<<"=> new child of new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
-			cout << new_node << "\t\t3.2) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << " (new node - after split - lower)" << endl;
+			//cout << new_node << "\t\t3.2) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << " (new node - after split - lower)" << endl;
 			if (new_node->getInLabelEnd() - new_node->getInLabelStart() != 0) {
 			    NodeInfo *node_info = new NodeInfo(str_id, suf_start, suf_end - suf_start + 1, new_node);
                 acc_nodes.push_back(node_info);
