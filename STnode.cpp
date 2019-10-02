@@ -250,10 +250,16 @@ long STnode::getOccsNum() const {
     return _occs_num;
 }
 
-void STnode::setCachedResult(TransitionMatrix *cachedResult) {
-    _cached_result = cachedResult;
+void STnode::setCachedResult(c_key key, TransitionMatrix *cachedResult) {
+    auto pair = make_pair(key, cachedResult);
+    this->_cached_results.insert(pair);
 }
 
-TransitionMatrix *STnode::getCachedResult() const {
-    return _cached_result;
+TransitionMatrix *STnode::getCachedResult(c_key key) const {
+
+    auto result = this->_cached_results.find(key);
+    if (result != this->_cached_results.end()) {
+        return result->second;
+    }
+    return nullptr;
 }

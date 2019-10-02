@@ -24,6 +24,7 @@
 #include <iostream>
 #include <vector>
 #include "../../TransitionMatrix/TransitionMatrix.h"
+#include "ConstraintsMap.h"
 using namespace std;
 
 /**
@@ -300,13 +301,15 @@ public:
      * Setter of the intermediate cached result of the node
      * @param cachedResult the result to be cached
      */
-    void setCachedResult(TransitionMatrix *cachedResult);
+    void setCachedResult(c_key key, TransitionMatrix *cachedResult);
 
     /**
      * Getter of the intermediate cached result of the node
      * @return the cached result (if any) or nullptr
      */
-    TransitionMatrix *getCachedResult() const;
+    TransitionMatrix *getCachedResult(c_key key) const;
+
+
 
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
@@ -319,6 +322,6 @@ private:
 	OccPos* _occ_positions; 
 	long _occs_num;
 
-	TransitionMatrix* _cached_result { nullptr };
+	c_map _cached_results;
 };
 #endif /* STNODE_H*/
