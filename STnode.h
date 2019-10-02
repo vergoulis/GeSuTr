@@ -309,7 +309,9 @@ public:
      */
     TransitionMatrix *getCachedResult(c_key key) const;
 
+    void setAlias(STnode* alias_ptr);
 
+    STnode* getAlias();
 
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
@@ -321,6 +323,7 @@ private:
 	long _in_label_end;
 	OccPos* _occ_positions; 
 	long _occs_num;
+    STnode* _alias { nullptr };
 
 	c_map _cached_results;
 };

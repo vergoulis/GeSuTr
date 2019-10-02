@@ -137,7 +137,7 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
             }
 		}
 		else
-		{	
+		{
 			//cout<<"part of edge matches, chars_read="<<chars_read<<", chars_matched="<<chars_matched<<", suf_start="<<suf_start<<endl; //DEBUG
 			//create new (intermediate) node (inital's node, new child)
 			new_node = new STnode(cur_node->getParent(),cur_node->getRefStrId(),cur_node->getInLabelStart(),cur_node->getInLabelStart()+chars_matched-1);
@@ -148,14 +148,22 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 				cur_node->getParent()->setChildren(new_node); //if not, fix the pointer to the first child of the parent
 			//cout<<"=> new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
-			//cout<<"\t\t3.1) visiting node "<< this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << " (new node - after split - upper)" << endl;
-            NodeInfo *node_info = new NodeInfo(str_id, suf_start, chars_read + chars_matched, new_node);
-			acc_nodes.push_back(node_info);
+			//cout<< cur_node << "\t\t3.1) visiting node "<< this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << " (new node - after split - upper)" << endl;
 
             //update old child of the initial node, to be child of the new (intermediate) node
 			cur_node->setInLabelStart(new_node->getInLabelEnd()+1);
 			cur_node->setParent(new_node);
 			new_node->setChildren(cur_node);
+
+            // intermediate results are cached in leaf nodes, so if a leaf is created with only '$' label
+            // then return this leaf instead of the parent that was newly created.
+            if(this->_strs[cur_node->getRefStrId()].substr(cur_node->getInLabelStart(), cur_node->getInLabelEnd()) == "$") {
+                new_node->setAlias(cur_node);
+            }
+
+            NodeInfo *node_info = new NodeInfo(str_id, suf_start, chars_read + chars_matched, new_node);
+            acc_nodes.push_back(node_info);
+
 			//cout<<"=> old intermediate updated: "<<cur_node<<" [str: "<<cur_node->getRefStrId()<<", st: "<<cur_node->getInLabelStart()<<", en: "<<cur_node->getInLabelEnd()<<", par: "<<cur_node->getParent()<<"]"<<endl; //DEBUG
 
 			//create new child of the new intermediate node (based on the remaining str)
@@ -164,7 +172,7 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 			cur_node->setRightSibling(new_node); //update the right sibling of old node to show the new child
 			//cout<<"=> new child of new intermediate node created: "<<new_node<<" [str: "<<new_node->getRefStrId()<<", st: "<<new_node->getInLabelStart()<<", en: "<<new_node->getInLabelEnd()<<", par: "<<new_node->getParent()<<"]"<<endl; //DEBUG
 
-			//cout << "\t\t3.2) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << " (new node - after split - lower)" << endl;
+			cout << new_node << "\t\t3.2) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << " (new node - after split - lower)" << endl;
 			if (new_node->getInLabelEnd() - new_node->getInLabelStart() != 0) {
 			    NodeInfo *node_info = new NodeInfo(str_id, suf_start, suf_end - suf_start + 1, new_node);
                 acc_nodes.push_back(node_info);
@@ -174,7 +182,6 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 		}
 		chars_read += chars_matched; 
 	}
-
 
 	return 0;
 }

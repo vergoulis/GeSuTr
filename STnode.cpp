@@ -18,6 +18,7 @@
  * Contact email: vergoulis@athenarc.gr
  */
 
+#include "../../Utils.h"
 #include "STnode.h"
 
 OccPos::OccPos(long str_id, long occ_pos, OccPos* next_pos)
@@ -256,10 +257,26 @@ void STnode::setCachedResult(c_key key, TransitionMatrix *cachedResult) {
 }
 
 TransitionMatrix *STnode::getCachedResult(c_key key) const {
+    Utils::printConstraint(key);
 
     auto result = this->_cached_results.find(key);
     if (result != this->_cached_results.end()) {
         return result->second;
     }
+
+    // if node has an alias, also search there
+    if (this->_alias != nullptr) {
+        return this->_alias->getCachedResult(key);
+    }
+
     return nullptr;
 }
+
+void STnode::setAlias(STnode* alias_ptr) {
+    this->_alias = alias_ptr;
+}
+
+STnode* STnode::getAlias() {
+    return this->_alias;
+}
+
