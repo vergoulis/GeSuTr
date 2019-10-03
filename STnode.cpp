@@ -250,10 +250,29 @@ long STnode::getOccsNum() const {
     return _occs_num;
 }
 
+void STnode::setAlias(STnode* alias_ptr) {
+    this->_alias = alias_ptr;
+}
+
+STnode* STnode::getAlias() {
+    return this->_alias;
+}
+
 void STnode::setCachedResult(TransitionMatrix *cachedResult) {
-    _cached_result = cachedResult;
+
+    // forward cached results to the alias node (if available)
+    if (this->_alias) {
+        this->_alias->setCachedResult(cachedResult);
+    } else {
+        _cached_result = cachedResult;
+    }
 }
 
 TransitionMatrix *STnode::getCachedResult() const {
+
+    if (this->_alias) {
+        return this->_alias->getCachedResult();
+    }
+
     return _cached_result;
 }

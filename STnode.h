@@ -308,6 +308,11 @@ public:
      */
     TransitionMatrix *getCachedResult() const;
 
+    void setAlias(STnode* alias_ptr);
+
+
+    STnode* getAlias();
+
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
 	long _str_id;
@@ -320,5 +325,9 @@ private:
 	long _occs_num;
 
 	TransitionMatrix* _cached_result { nullptr };
+
+	// when a child node has only '$' as a label, then is marked as an alias to the parent node
+    STnode* _alias { nullptr };
+
 };
 #endif /* STNODE_H*/
