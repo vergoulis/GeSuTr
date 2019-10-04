@@ -176,7 +176,10 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 			if (new_node->getInLabelEnd() - new_node->getInLabelStart() != 0) {
 			    NodeInfo *node_info = new NodeInfo(str_id, suf_start, suf_end - suf_start + 1, new_node);
                 acc_nodes.push_back(node_info);
-            }
+            } else {
+                // new node has only '$' label so its parent is an alias this one
+			    cur_node->getParent()->setAlias(new_node);
+			}
 
             break;
 		}

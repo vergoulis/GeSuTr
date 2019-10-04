@@ -251,25 +251,80 @@ long STnode::getOccsNum() const {
     return _occs_num;
 }
 
-void STnode::setCachedResult(c_key key, TransitionMatrix *cachedResult) {
-    auto pair = make_pair(key, cachedResult);
-    this->_cached_results.insert(pair);
+int STnode::getOccsNum(c_key con) const {
+    if (this->_alias) {
+        return this->_alias->getOccsNum(con);
+    }
+
+    auto result = this->_cached_results.find(con);
+    if (result != this->_cached_results.end()) {
+        return result->second.count;
+    }
+    return 0;
 }
 
-TransitionMatrix *STnode::getCachedResult(c_key key) const {
-    // Utils::printConstraint(key);
+void STnode::setCachedResult(c_key key, TransitionMatrix *cachedResult) {
+
+    // propagate cached results to alias nodes
+    if (this->_alias) {
+        return this->_alias->setCachedResult(key, cachedResult);
+    }
 
     auto result = this->_cached_results.find(key);
     if (result != this->_cached_results.end()) {
-        return result->second;
+        result->second.cached_result = cachedResult;
+    }
+}
+
+TransitionMatrix *STnode::getCachedResult(c_key key, int s) const {
+
+    // get cached result from alias node
+    if (this->_alias) {
+        return this->_alias->getCachedResult(key, s);
     }
 
-    // if node has an alias, also search there
-    if (this->_alias != nullptr) {
-        return this->_alias->getCachedResult(key);
+    auto result = this->_cached_results.find(key);
+    if (result != this->_cached_results.end()) {
+        //Utils::printConstraint(result->first);
+
+        if (result->second.count >= s) {
+            return result->second.cached_result;
+        }
     }
 
     return nullptr;
+}
+
+void STnode::updateCnt(c_key key) {
+
+    if (this->_alias) {
+        this->_alias->updateCnt(key);
+        return;
+    }
+
+    // increase counter of cached result
+    auto result = this->_cached_results.find(key);
+    if (result != this->_cached_results.end()) {
+        result->second.count++;
+
+    } else {
+        c_value value;
+        value.count = 1;
+        value.cached_result = nullptr;
+        auto pair = make_pair(key, value);
+        this->_cached_results.insert(pair);
+    }
+}
+
+void STnode::printConstraints() {
+    c_map::iterator it;
+
+    for ( it = this->_cached_results.begin(); it != this->_cached_results.end(); it++ )
+    {
+        Utils::printConstraint(it->first);
+        cout << "\tCOUNT: " << it->second.count << endl;
+        cout << "\tCACHE PNT: " << it->second.cached_result << endl << endl;
+    }
 }
 
 void STnode::setAlias(STnode* alias_ptr) {

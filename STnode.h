@@ -307,11 +307,15 @@ public:
      * Getter of the intermediate cached result of the node
      * @return the cached result (if any) or nullptr
      */
-    TransitionMatrix *getCachedResult(c_key key) const;
+    TransitionMatrix *getCachedResult(c_key key, int s) const;
 
     void setAlias(STnode* alias_ptr);
 
     STnode* getAlias();
+
+    void updateCnt(c_key key);
+    void printConstraints();
+    int getOccsNum(c_key con) const;
 
 private:
 	//All variables are explained in the javadoc comments of the STnode class.

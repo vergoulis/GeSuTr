@@ -30,7 +30,13 @@ struct key_equal : public std::binary_function<c_key, c_key, bool>
     }
 };
 
-typedef std::unordered_map<const c_key, TransitionMatrix*, key_hash, key_equal> c_map;
+class c_value {
+public:
+    int count = 0;
+    TransitionMatrix* cached_result;
+};
+
+typedef std::unordered_map<const c_key, c_value, key_hash, key_equal> c_map;
 
 
 #endif //MPPAGERANK_CONSTRAINTSMAP_H
