@@ -263,7 +263,7 @@ int STnode::getOccsNum(c_key con) const {
     return 0;
 }
 
-void STnode::setCachedResult(c_key key, TransitionMatrix *cachedResult) {
+void STnode::setCachedResult(c_key key, CacheItem *cachedResult) {
 
     // propagate cached results to alias nodes
     if (this->_alias) {
@@ -276,7 +276,7 @@ void STnode::setCachedResult(c_key key, TransitionMatrix *cachedResult) {
     }
 }
 
-TransitionMatrix *STnode::getCachedResult(c_key key, int s) const {
+CacheItem *STnode::getCachedResult(c_key key, int s) const {
 
     // get cached result from alias node
     if (this->_alias) {

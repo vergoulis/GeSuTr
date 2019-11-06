@@ -33,7 +33,7 @@ struct key_equal : public std::binary_function<c_key, c_key, bool>
 class c_value {
 public:
     int count = 0;
-    TransitionMatrix* cached_result;
+    CacheItem* cached_result;
 };
 
 typedef std::unordered_map<const c_key, c_value, key_hash, key_equal> c_map;

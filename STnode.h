@@ -23,7 +23,7 @@
 
 #include <iostream>
 #include <vector>
-#include "../../TransitionMatrix/TransitionMatrix.h"
+#include "../../Cache/CacheItem.h"
 #include "ConstraintsMap.h"
 using namespace std;
 
@@ -301,13 +301,13 @@ public:
      * Setter of the intermediate cached result of the node
      * @param cachedResult the result to be cached
      */
-    void setCachedResult(c_key key, TransitionMatrix *cachedResult);
+    void setCachedResult(c_key key, CacheItem *cachedResult);
 
     /**
      * Getter of the intermediate cached result of the node
      * @return the cached result (if any) or nullptr
      */
-    TransitionMatrix *getCachedResult(c_key key, int s) const;
+    CacheItem *getCachedResult(c_key key, int s) const;
 
     void setAlias(STnode* alias_ptr);
 
