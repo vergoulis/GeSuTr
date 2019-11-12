@@ -272,6 +272,7 @@ void STnode::setCachedResult(c_key key, CacheItem *cachedResult) {
 
     auto result = this->_cached_results.find(key);
     if (result != this->_cached_results.end()) {
+		delete result->second.cached_result;
         result->second.cached_result = cachedResult;
     }
 }
