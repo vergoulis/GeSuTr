@@ -312,8 +312,7 @@ void STnode::updateCnt(c_key key) {
         c_value value;
         value.count = 1;
         value.cached_result = nullptr;
-        auto pair = make_pair(key, value);
-        this->_cached_results.insert(pair);
+        this->_cached_results.emplace(key, value);
     }
 }
 
