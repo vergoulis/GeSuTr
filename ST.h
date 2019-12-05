@@ -73,7 +73,7 @@ public:
 	 *
 	 * @author Thanasis Vergoulis
 	 */
-    vector<NodeInfo*> strInsertNaive(string str);
+    vector<NodeInfo*> strInsertNaive(string str, int constraintIndex, tuple<string, string, string> constraint);
 
 	/**
 	 * Inserts one-by-one the strings contained in a given array to the tree. It calls strInsertNaive() multiple times. 
@@ -85,7 +85,7 @@ public:
 	 *
 	 * @author Thanasis Vergoulis
 	 */
-	int strInsertNaive(string* strs, long strs_num);
+	int strInsertNaive(string* strs, long strs_num, int constraintIndex, tuple<string, string, string> constraint);
 
 	/**
 	 * Inserts a suffix of the str_id-th string of the registry in the tree. 
@@ -96,7 +96,7 @@ public:
 	 *
 	 * @return It returns 0 on success. 
 	 */
-	int insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*> & acc_nodes);
+	int insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*> & acc_nodes, bool hasConstraint, tuple<string, string, string> constraint);
 
 	/**
 	 * Inserts a given string in the registry (vector) of strings. 
@@ -284,6 +284,8 @@ public:
 	 * @author Thanasis Vergoulis
 	 */
 	string getRegSubStr(long str_id, long str_start, long str_len);
+
+	void printNodeInfo(NodeInfo *n);
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
 	vector<string> _strs; 

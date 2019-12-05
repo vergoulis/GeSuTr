@@ -28,7 +28,7 @@ ST::ST()
 ST::ST(string* strs, long strs_num)
 {
 	this->_st_root = new STnode(NULL,0,0,strs[0].length()-1); //create root node
-	this->strInsertNaive(strs, strs_num); //insert all strings in the tree one-by-one
+	this->strInsertNaive(strs, strs_num , -1, make_tuple("","","")); //insert all strings in the tree one-by-one
 }
 
 ST::~ST()
@@ -37,7 +37,7 @@ ST::~ST()
     //cout << "tree deleted" << endl;
 }
 
-vector<NodeInfo*> ST::strInsertNaive(string str)
+vector<NodeInfo*> ST::strInsertNaive(string str, int constraintIndex, tuple<string, string, string> constraint)
 {
     vector<NodeInfo*> acc_nodes; // nodes that are accessed during the insertion
 
@@ -53,10 +53,18 @@ vector<NodeInfo*> ST::strInsertNaive(string str)
 		this->_st_root = new STnode(NULL,str_id,0,str.length()-1); 
 	}
 
-	for( long i=0; i<this->_strs[str_id].length(); i++ )
+	long len = this->_strs[str_id].length();
+	for( long i=0; i<len; i++ )
 	{
-		//cout<<"\t - Inserting suffix '"<<this->_strs[str_id].substr(i,this->_strs[str_id].length()-i)<<"' to the tree..."<<endl; //DEBUG
-		this->insertSuffix(str_id,i, this->_strs[str_id].length()-1, acc_nodes); //insert the i-th suffix to the tree
+		// cout<<"\t - Inserting suffix '"<<this->_strs[str_id].substr(i,this->_strs[str_id].length()-i)<<"' to the tree..."<<endl; //DEBUG
+		
+		// create constraint accordingly
+		tuple<string, string, string> c = make_tuple("","","");
+		if (i <= constraintIndex) {
+			c = constraint;
+		}
+
+		this->insertSuffix(str_id,i, this->_strs[str_id].length()-1, acc_nodes, (i <= constraintIndex), c); //insert the i-th suffix to the tree
 		//cout<<"\t - Suffix inserted..."<<endl;
 		//this->print(); //DEBUG
 	}
@@ -65,15 +73,16 @@ vector<NodeInfo*> ST::strInsertNaive(string str)
 	return acc_nodes;
 }
 
-int ST::strInsertNaive(string* strs, long str_num)
+int ST::strInsertNaive(string* strs, long str_num, int constraintIndex, tuple<string, string, string> constraint)
 {
 	for(long i=0; i<str_num; i++)
-		this->strInsertNaive(strs[i]);
+		this->strInsertNaive(strs[i], constraintIndex, make_tuple("","",""));
 	return 0; 
 }
 
-int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*> & acc_nodes)
+int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*> & acc_nodes, bool hasConstraint, tuple<string, string, string> constraint)
 {
+
 	STnode* cur_node = this->_st_root;
 	STnode* pre_node; //auxiliary variable for previous sibling node
 	//STnode* init_node = this->_st_root;
@@ -107,7 +116,8 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 
             //cout << "\t\t1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size() - suf_start) << endl;
             if (new_node->getInLabelEnd() - new_node->getInLabelStart() != 0) {
-                NodeInfo *node_info = new NodeInfo(str_id, suf_start, this->_strs[str_id].size() - suf_start, new_node);
+                NodeInfo *node_info = new NodeInfo(str_id, suf_start, this->_strs[str_id].size() - suf_start, new_node, hasConstraint);
+				node_info->_node_ptr->updateCnt(constraint);
                 acc_nodes.push_back(node_info);
             }
 
@@ -125,14 +135,16 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 
                 //cout << "\t\t2.1) visiting node " << this->_strs[str_id].substr(suf_start, this->_strs[str_id].size() - suf_start) << endl;
                 if (cur_node->getInLabelStart() - cur_node->getInLabelEnd() != 0) {
-                    NodeInfo *node_info = new NodeInfo(str_id, suf_start, this->_strs[str_id].size() - suf_start, cur_node);
+                    NodeInfo *node_info = new NodeInfo(str_id, suf_start, this->_strs[str_id].size() - suf_start, cur_node, hasConstraint);
+					node_info->_node_ptr->updateCnt(constraint);
                     acc_nodes.push_back(node_info);
                 }
 
             } else {
 			    //cout << chars_read << " + " << chars_matched << endl;
                 //cout << "\t\t2.2) visiting node " << this->_strs[str_id].substr(suf_start, chars_read + chars_matched) << endl;
-                NodeInfo *node_info = new NodeInfo(str_id, suf_start, chars_read + chars_matched, cur_node);
+                NodeInfo *node_info = new NodeInfo(str_id, suf_start, chars_read + chars_matched, cur_node, hasConstraint);
+				node_info->_node_ptr->updateCnt(constraint);
                 acc_nodes.push_back(node_info);
             }
 		}
@@ -155,13 +167,20 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 			cur_node->setParent(new_node);
 			new_node->setChildren(cur_node);
 
+			// copy constraint counts from node that was split
+			// cout << "new node: " << new_node << "\told node: " << cur_node << endl;
+			new_node->copyCachedResultsMap(cur_node->getCachedResults());
+
             // intermediate results are cached in leaf nodes, so if a leaf is created with only '$' label
             // then return this leaf instead of the parent that was newly created.
             if(this->_strs[cur_node->getRefStrId()].substr(cur_node->getInLabelStart(), cur_node->getInLabelEnd()) == "$") {
-                new_node->setAlias(cur_node);
-            }
-
-            NodeInfo *node_info = new NodeInfo(str_id, suf_start, chars_read + chars_matched, new_node);
+                new_node->setAlias(cur_node);			
+            } else {
+				new_node->deleteCachedResults();
+			}
+			
+            NodeInfo *node_info = new NodeInfo(str_id, suf_start, chars_read + chars_matched, new_node, hasConstraint);
+			node_info->_node_ptr->updateCnt(constraint);
             acc_nodes.push_back(node_info);
 
 			//cout<<"=> old intermediate updated: "<<cur_node<<" [str: "<<cur_node->getRefStrId()<<", st: "<<cur_node->getInLabelStart()<<", en: "<<cur_node->getInLabelEnd()<<", par: "<<cur_node->getParent()<<"]"<<endl; //DEBUG
@@ -174,11 +193,15 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 
 			//cout << new_node << "\t\t3.2) visiting node " << this->_strs[str_id].substr(suf_start, suf_end - suf_start + 1) << " (new node - after split - lower)" << endl;
 			if (new_node->getInLabelEnd() - new_node->getInLabelStart() != 0) {
-			    NodeInfo *node_info = new NodeInfo(str_id, suf_start, suf_end - suf_start + 1, new_node);
+			    NodeInfo *node_info = new NodeInfo(str_id, suf_start, suf_end - suf_start + 1, new_node, hasConstraint);
+				node_info->_node_ptr->updateCnt(constraint);
                 acc_nodes.push_back(node_info);
             } else {
                 // new node has only '$' label so its parent is an alias this one
 			    cur_node->getParent()->setAlias(new_node);
+
+				new_node->copyCachedResultsMap(cur_node->getCachedResults());
+				new_node->updateCnt(constraint);
 			}
 
             break;
@@ -447,4 +470,10 @@ string ST::getRegStr(long str_id)
 string ST::getRegSubStr(long str_id, long str_start, long str_len)
 {
 	return this->_strs[str_id].substr(str_start,str_len);
+}
+
+void ST::printNodeInfo(NodeInfo *n) {
+	cout << "\t" << this->getRegSubStr(n->_str_id, n->_start, n->_size);
+	cout << " (" << ((n->_has_constraint) ? "CONSTRAINT" : "NO CONSTRAINT") << " - COUNT: " << n->_node_ptr->getOccsNum() << ")" << endl;
+	n->_node_ptr->printConstraints();
 }

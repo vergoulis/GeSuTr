@@ -316,6 +316,9 @@ public:
     void updateCnt(c_key key);
     void printConstraints();
     int getOccsNum(c_key con) const;
+	c_map getCachedResults() { return this->_cached_results; }
+	void copyCachedResultsMap(c_map m);
+	void deleteCachedResults();
 
 private:
 	//All variables are explained in the javadoc comments of the STnode class.

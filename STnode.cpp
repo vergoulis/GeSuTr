@@ -20,6 +20,7 @@
 
 #include "../../Utils.h"
 #include "STnode.h"
+#include "ConstraintsMap.h"
 
 OccPos::OccPos(long str_id, long occ_pos, OccPos* next_pos)
 {
@@ -317,13 +318,18 @@ void STnode::updateCnt(c_key key) {
 }
 
 void STnode::printConstraints() {
+	if (this->_alias) {
+		this->_alias->printConstraints();
+		return;
+	}
+
     c_map::iterator it;
 
     for ( it = this->_cached_results.begin(); it != this->_cached_results.end(); it++ )
     {
         Utils::printConstraint(it->first);
-        cout << "\tCOUNT: " << it->second.count << endl;
-        cout << "\tCACHE PNT: " << it->second.cached_result << endl << endl;
+        cout << ",\tCOUNT: " << it->second.count;
+        cout << ",\tCACHE PNT: " << it->second.cached_result << endl;
     }
 }
 
@@ -333,5 +339,25 @@ void STnode::setAlias(STnode* alias_ptr) {
 
 STnode* STnode::getAlias() {
     return this->_alias;
+}
+
+void STnode::copyCachedResultsMap(c_map m) {
+	if (this->_alias) {
+		this->_alias->copyCachedResultsMap(m);
+		return;
+	}
+
+	this->_cached_results = m;
+}
+
+void STnode::deleteCachedResults() {
+	if (this->_alias) {
+		this->_alias->deleteCachedResults();
+		return;
+	}
+
+	for (auto& it: this->_cached_results) {
+		it.second.cached_result = nullptr;
+	} 
 }
 

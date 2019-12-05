@@ -7,6 +7,7 @@
 
 
 #include "STnode.h"
+#include "ST.h"
 
 class NodeInfo {
 
@@ -15,9 +16,10 @@ public:
     long _start;
     long _size;
     STnode* _node_ptr;
+    bool _has_constraint;
 
-    NodeInfo(long str_id, long start, long size, STnode *node_ptr)
-        : _str_id(str_id), _start(start), _size(size), _node_ptr(node_ptr) {}
+    NodeInfo(long str_id, long start, long size, STnode *node_ptr, bool has_constraint)
+        : _str_id(str_id), _start(start), _size(size), _node_ptr(node_ptr), _has_constraint(has_constraint) {}
 
 };
 
