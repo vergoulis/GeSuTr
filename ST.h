@@ -286,6 +286,8 @@ public:
 	string getRegSubStr(long str_id, long str_start, long str_len);
 
 	void printNodeInfo(NodeInfo *n);
+
+	void traverseSubtree(STnode* src_node, vector<STnode*> &subtreeNodes);
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
 	vector<string> _strs; 

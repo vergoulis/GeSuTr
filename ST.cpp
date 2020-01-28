@@ -173,14 +173,16 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 			cur_node->setParent(new_node);
 			new_node->setChildren(cur_node);
 
-			// copy constraint counts from node that was split
-			// cout << "new node: " << new_node << "\told node: " << cur_node << endl;
-			new_node->copyCachedResultsMap(cur_node->getCachedResults());
+			// copy constraint counts from node that was split (removed)
 
             // intermediate results are cached in leaf nodes, so if a leaf is created with only '$' label
             // then return this leaf instead of the parent that was newly created.
             if(this->_strs[cur_node->getRefStrId()].substr(cur_node->getInLabelStart(), cur_node->getInLabelEnd()) == "$") {
-                new_node->setAlias(cur_node);			
+                new_node->setAlias(cur_node);
+
+				// adjust cached items to point to the parent node (to which cur_node is alias)
+				cur_node->changeCachedResultsRefNode(new_node);
+			
             } else {
 				new_node->deleteCachedResults();
 			}
@@ -208,7 +210,8 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
             } else {
                 // new node has only '$' label so its parent is an alias this one
 			    cur_node->getParent()->setAlias(new_node);
-
+				
+				// copy cached results from the parent
 				new_node->copyCachedResultsMap(cur_node->getCachedResults());
 				new_node->updateCnt(constraint);
 			}
@@ -383,6 +386,19 @@ void ST::print(void)
 	this->printNode( this->_st_root, 0);
 }
 
+void ST::traverseSubtree(STnode* src_node, vector<STnode*> &subtreeNodes) {
+
+	subtreeNodes.push_back(src_node);
+
+	STnode* firstChild = src_node->getChildren();	//Get the first of the node's children
+
+	//Recursive call for all node1's children
+	while(firstChild) {
+		this->traverseSubtree(firstChild, subtreeNodes);
+		firstChild = firstChild->getRightSibling();
+	}
+}
+
 void ST::printNode( STnode* src_node, long depth)
 {
 	STnode* node2 = src_node->getChildren();	//Get the first of the node's children
@@ -408,7 +424,18 @@ void ST::printNode( STnode* src_node, long depth)
 		
 		cout<<this->_strs[str_id].substr(start,end-start+1)<<"[";
 		src_node->printOccPos();
-		cout<<"]"<< " (" << src_node->getOccsNum() << ")"<< " " << src_node << endl;
+		cout<<"]"<< " (" << src_node->getOccsNum() << ")"<< " " << src_node << " alias: " << src_node->getAlias() << " => ";
+
+		cout << "[";
+		for (auto& it: src_node->getCachedResults()) {
+			// Do stuff
+			STnode* nodePtr = nullptr;
+			if (it.second.cached_result) {
+				nodePtr = it.second.cached_result->getNodeRef();
+			}
+			cout << "{ name:" << get<2>(it.first) << ", count: " << it.second.count << ", cacheI: " << it.second.cached_result << ", cacheINodePtr: " << nodePtr << " } ";
+		}
+		cout << "]" << endl;
 	}
 	//Recursive call for all node1's children
 	while( node2!=NULL)

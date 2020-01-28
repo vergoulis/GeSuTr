@@ -278,11 +278,11 @@ void STnode::setCachedResult(c_key key, CacheItem *cachedResult) {
     }
 }
 
-CacheItem *STnode::getCachedResult(c_key key, int s) const {
+CacheItem *STnode::getCachedResult(c_key key, int s, bool followAlias) const {
 
     // get cached result from alias node
-    if (this->_alias) {
-        return this->_alias->getCachedResult(key, s);
+    if (followAlias && this->_alias) {
+        return this->_alias->getCachedResult(key, s, followAlias);
     }
 
     auto result = this->_cached_results.find(key);
@@ -348,6 +348,14 @@ void STnode::copyCachedResultsMap(c_map m) {
 	}
 
 	this->_cached_results = m;
+}
+
+void STnode::changeCachedResultsRefNode(STnode* new_node_ref) {
+    for (auto& c : this->_cached_results) {
+        if (c.second.cached_result) {
+            c.second.cached_result->setNodeRef(new_node_ref);
+        }
+    }
 }
 
 void STnode::deleteCachedResults() {

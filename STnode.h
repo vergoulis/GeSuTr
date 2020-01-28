@@ -307,7 +307,7 @@ public:
      * Getter of the intermediate cached result of the node
      * @return the cached result (if any) or nullptr
      */
-    CacheItem *getCachedResult(c_key key, int s) const;
+    CacheItem *getCachedResult(c_key key, int s, bool followAlias) const;
 
     void setAlias(STnode* alias_ptr);
 
@@ -319,6 +319,7 @@ public:
 	c_map getCachedResults() { return this->_cached_results; }
 	void copyCachedResultsMap(c_map m);
 	void deleteCachedResults();
+	void changeCachedResultsRefNode(STnode* new_ref_node);
 
 private:
 	//All variables are explained in the javadoc comments of the STnode class.
