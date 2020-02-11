@@ -358,9 +358,9 @@ void STnode::changeCachedResultsRefNode(STnode* new_node_ref) {
     }
 }
 
-void STnode::deleteCachedResults() {
-	if (this->_alias) {
-		this->_alias->deleteCachedResults();
+void STnode::deleteCachedResults(bool follow_alias) {
+	if (this->_alias && follow_alias) {
+		this->_alias->deleteCachedResults(follow_alias);
 		return;
 	}
 

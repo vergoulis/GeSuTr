@@ -182,10 +182,12 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 
 				// adjust cached items to point to the parent node (to which cur_node is alias)
 				cur_node->changeCachedResultsRefNode(new_node);
-			
-            } else {
-				new_node->deleteCachedResults();
-			}
+				// new_node->deleteCachedResults(false);		// commented
+
+            } 
+			// else {	// commented
+			// 	new_node->deleteCachedResults(true);
+			// }
 			
 			if (chars_read + chars_matched > 2) {
 				NodeInfo *node_info = new NodeInfo(str_id, suf_start, chars_read + chars_matched, new_node, hasConstraint);
@@ -212,8 +214,9 @@ int ST::insertSuffix(long str_id, long suf_start, long suf_end, vector<NodeInfo*
 			    cur_node->getParent()->setAlias(new_node);
 				
 				// copy cached results from the parent
-				new_node->copyCachedResultsMap(cur_node->getCachedResults());
+				// new_node->copyCachedResultsMap(cur_node->getCachedResults());	// commented
 				new_node->updateCnt(constraint);
+				// cur_node->deleteCachedResults(false);	// commented
 			}
 
             break;
@@ -423,17 +426,20 @@ void ST::printNode( STnode* src_node, long depth)
 		cout<<"+";
 		
 		cout<<this->_strs[str_id].substr(start,end-start+1)<<"[";
-		src_node->printOccPos();
+		// src_node->printOccPos();
 		cout<<"]"<< " (" << src_node->getOccsNum() << ")"<< " " << src_node << " alias: " << src_node->getAlias() << " => ";
 
 		cout << "[";
 		for (auto& it: src_node->getCachedResults()) {
 			// Do stuff
 			STnode* nodePtr = nullptr;
+			string cachedSubpath = "";
 			if (it.second.cached_result) {
 				nodePtr = it.second.cached_result->getNodeRef();
+				if (it.second.cached_result->getMatrix())
+					cachedSubpath = it.second.cached_result->getMatrix()->get_relation();
 			}
-			cout << "{ name:" << get<2>(it.first) << ", count: " << it.second.count << ", cacheI: " << it.second.cached_result << ", cacheINodePtr: " << nodePtr << " } ";
+			cout << "{ id:" << get<2>(it.first) << ", count: " << it.second.count << ", cacheS: " << cachedSubpath << ", cacheINodePtr: " << nodePtr << " } ";
 		}
 		cout << "]" << endl;
 	}

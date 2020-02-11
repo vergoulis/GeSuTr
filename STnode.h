@@ -318,7 +318,7 @@ public:
     int getOccsNum(c_key con) const;
 	c_map getCachedResults() { return this->_cached_results; }
 	void copyCachedResultsMap(c_map m);
-	void deleteCachedResults();
+	void deleteCachedResults(bool follow_alias);
 	void changeCachedResultsRefNode(STnode* new_ref_node);
 
 private:
